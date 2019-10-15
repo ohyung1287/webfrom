@@ -2,26 +2,16 @@ import React from "react";
 import { Button, Form, FormGroup, Label, Input } from "reactstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Web3 from "web3";
-import abi from "../abi";
+import axios from "axios";
 export default class FormPage extends React.Component {
   constructor(props) {
-    super(props);
+    super(props); 
     this.state = {
       accessibility: null,
       DRM_contract: null
     };
     this.onFormsubmit = this.onFormsubmit.bind(this);
     this.accessibilityChange = this.accessibilityChange.bind(this);
-  }
-  componentDidMount() {
-    window.web3 = new Web3(window.ethereum);
-    window.ethereum.enable().catch(err => null);
-    var instance = new window.web3.eth.Contract(
-      abi,
-      "0x71bb75a1f6d291d044bc5cc678c7126f07ee9667"
-    );
-    this.setState({ DRM_contract: instance });
-    console.log(instance);
   }
   accessibilityChange(e) {
     this.setState({ accessibility: e.target.value });
@@ -31,7 +21,6 @@ export default class FormPage extends React.Component {
     // console.log(this.state.accessibility);
     // console.log(e.target.elements.title.value);
     if (this.state.accessibility) {
-      //public
       var price = e.target.elements.price.value;
       var name = e.target.elements.title.value;
       var artist = e.target.elements.artist.value;
@@ -39,19 +28,25 @@ export default class FormPage extends React.Component {
       var realart = e.target.elements.art.value;
       var thumnail = e.target.elements.thumnail.value;
       var deployNum = e.target.elements.number.value;
-      // this.state.DRM_contract.methods
-      //   .publicCreation(
-      //     price,
-      //     name,
-      //     artist,
-      //     description,
-      //     realart,
-      //     thumnail,
-      //     deployNum
-      //   )
-      //   .send({
-      //     gas: 2100000
-      //   });
+      window.web3 = new Web3(window.ethereum);
+      window.ethereum.enable().then((res)=>{
+        axios
+        .post(`http://localhost:8080/publicCreation/`, {
+          address: res[0],
+          price: price,
+          name: name,
+          artist: artist,
+          description: description,
+          realart: realart,
+          thumnail: thumnail,
+          deployNum: deployNum
+        })
+        .then(res => res.json())
+        .catch(err => console.log(err));
+  
+      }).catch(err => null);
+
+      //public
     } else {
     }
   }
