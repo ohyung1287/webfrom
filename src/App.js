@@ -7,11 +7,12 @@ import {
   NavLink,
   Card,
   Button,
-  CardTitle,
+  CardTitle, 
   CardText,
   Row,
   Col
 } from "reactstrap";
+import abi from "./abi";
 import Web3 from "web3";
 import axios from "axios";
 import "./App.css";
@@ -20,14 +21,15 @@ import { element } from "prop-types";
 export default class TabView extends React.Component {
   constructor(props) {
     super(props);
-
     this.toggle = this.toggle.bind(this);
     this.state = {
       api: "http://localhost:8080",
       activeTab: "1",
       wallet: null,
       onStoreList: null,
-      tokenList: null
+      tokenList: null,
+      web3: null,
+      DRM:null
     };
   }
 
@@ -41,6 +43,8 @@ export default class TabView extends React.Component {
   componentDidMount() {
     if (window.ethereum) {
       window.web3 = new Web3(window.ethereum);
+      this.setState({web3:window.web3});
+
       window.ethereum
         .enable()
         .then(res => {
@@ -49,7 +53,6 @@ export default class TabView extends React.Component {
             .post(`${this.state.api}/getOwnerTokens/`, { address: res[0] })
             .then(res => {
               // console.log(res.data);
-              console.log(res);
               this.setState({ tokenList: res.data });
             })
             .catch(err => console.log(err));
@@ -71,6 +74,17 @@ export default class TabView extends React.Component {
   render() {
     let item = [];
     let storeList = this.state.onStoreList;
+    let DRM;
+    let wallet;
+    let web3;
+    let assetID;
+    if(this.state.web3!=null){
+      console.log(this.state.web3);
+      DRM = new this.state.web3.eth.Contract(abi,"0x25b099439d0282fa4daec224aef9ffe6fc3b9b61");
+      wallet = this.state.wallet;
+      web3 = this.state.web3;
+    }
+
     function tab3() {
       if (storeList != null)
         for (var i = 0; i < storeList.length; i++) {
@@ -87,7 +101,15 @@ export default class TabView extends React.Component {
                     <div>timestamp:{storeList[i].timestamp}</div>
                     <div>id:{storeList[i].id}</div>
                   </CardText>
-                  <Button>Buy</Button>
+                  <Button value={storeList[i].id} onClick={(e)=>{
+                    console.log(e.target.value);
+                    DRM.methods.requestBuy(0).send({
+                      from: wallet,
+                      gas: '480000',
+                      value:'50',
+                      gasPrice: web3.utils.toWei('20', 'gwei')
+                    });
+                  }}>Buy</Button>
                 </Card>
               </Col>
             </Row>
@@ -120,7 +142,8 @@ export default class TabView extends React.Component {
           );
         }
     }
-    tab4();
+    tab4();        
+
     return (
       <div>
         <Nav tabs>
