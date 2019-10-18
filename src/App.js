@@ -97,13 +97,12 @@ export default class TabView extends React.Component {
                     <div>artist:{storeList[i].artist}</div>
                     <div>descrption:{storeList[i].description}</div>
                     <div>realart:{storeList[i].realart}</div>
-                    <div>thumnail:{storeList[i].thumnail}</div>
+                    <div>thumnail:<img src={storeList[i].thumbnail}></img></div>
                     <div>timestamp:{storeList[i].timestamp}</div>
                     <div>id:{storeList[i].id}</div>
                   </CardText>
                   <Button value={storeList[i].id} onClick={(e)=>{
-                    console.log(e.target.value);
-                    DRM.methods.requestBuy(0).send({
+                    DRM.methods.requestBuy(e.target.value).send({
                       from: wallet,
                       gas: '480000',
                       value:'50',
@@ -123,6 +122,7 @@ export default class TabView extends React.Component {
     function tab4() {
       if (tokenList != null)
         for (var i = 0; i < tokenList.length; i++) {
+          console.log(tokenList[i]);
           item2.push(
             <Row>
               <Col>
@@ -132,7 +132,7 @@ export default class TabView extends React.Component {
                     <div>artist:{tokenList[i].artist}</div>
                     <div>descrption:{tokenList[i].description}</div>
                     <div>realart:{tokenList[i].realart}</div>
-                    <div>thumnail:{tokenList[i].thumnail}</div>
+                    <div><img src={tokenList[i].thumbnail}></img></div>
                     <div>timestamp:{tokenList[i].timestamp}</div>
                     <div>id:{tokenList[i].id}</div>
                   </CardText>
